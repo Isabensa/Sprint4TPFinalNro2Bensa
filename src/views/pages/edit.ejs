@@ -1,0 +1,57 @@
+<div class="edit-superhero-container">
+    <h1 class="title">Editor de Superhéroes</h1>
+    <div class="image-section">
+      <img src="/images/edit1.jpg" alt="Ironman" class="edit-image">
+    </div>
+  
+    <% if (!superhero) { %>
+      <form action="/api/edit/find" method="POST" class="edit-form">
+        <label for="id">Ingrese el ID del Superhéroe:</label>
+        <input type="text" name="id" id="id" placeholder="ID del superhéroe" required>
+        <div class="button-box">
+          <button type="submit" class="search-button">Buscar</button>
+        </div>
+        <% if (error) { %>
+          <p class="error-message"><%= error %></p>
+        <% } %>
+      </form>
+    <% } else { %>
+      <form action="/api/edit/<%= superhero._id %>/save" method="POST" class="edit-form">
+        <label for="nombreSuperHeroe">Nombre del Superhéroe:</label>
+        <input type="text" name="nombreSuperHeroe" id="nombreSuperHeroe" value="<%= superhero.nombreSuperHeroe %>" required>
+        
+        <label for="nombreReal">Nombre Real:</label>
+        <input type="text" name="nombreReal" id="nombreReal" value="<%= superhero.nombreReal %>" required>
+  
+        <label for="edad">Edad:</label>
+        <input type="number" name="edad" id="edad" value="<%= superhero.edad %>" required>
+  
+        <label for="planetaOrigen">Planeta de Origen:</label>
+        <input type="text" name="planetaOrigen" id="planetaOrigen" value="<%= superhero.planetaOrigen %>">
+  
+        <label for="debilidad">Debilidad:</label>
+        <input type="text" name="debilidad" id="debilidad" value="<%= superhero.debilidad %>">
+  
+        <label for="poderes">Poderes (separados por comas):</label>
+        <input type="text" name="poderes" id="poderes" value="<%= superhero.poderes.join(',') %>">
+  
+        <label for="aliados">Aliados (separados por comas):</label>
+        <input type="text" name="aliados" id="aliados" value="<%= superhero.aliados.join(',') %>">
+  
+        <label for="enemigos">Enemigos (separados por comas):</label>
+        <input type="text" name="enemigos" id="enemigos" value="<%= superhero.enemigos.join(',') %>">
+  
+        <div class="button-box">
+          <button type="submit" class="save-button">Guardar</button>
+          <a href="/api/" class="home-button">Home</a>
+        </div>
+  
+        <% if (success) { %>
+          <p class="success-message"><%= success %></p>
+        <% } %>
+      </form>
+    <% } %>
+  </div>
+  
+  <%- include('../partials/footer') %>
+  

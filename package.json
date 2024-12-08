@@ -1,0 +1,28 @@
+{
+  "type": "module",
+  "main": "src/app.mjs",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-validator": "^7.2.0",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.8.4",
+    "validator": "^13.12.0"
+  },
+  "name": "sprint4tpfinalbensa",
+  "version": "1.0.0",
+  "description": "API desarrollada en Node.js y MongoDB para gestionar un catálogo de superhéroes. Permite realizar operaciones CRUD (por ahora GET) y consultar superhéroes por atributos específicos, como edad y planeta de origen.",
+  "scripts": {
+    "start": "node src/app.mjs",
+    "dev": "nodemon src/app.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

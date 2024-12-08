@@ -1,0 +1,71 @@
+<div class="delete-superhero-container">
+  <h1 class="title">Eliminación de Superhéroes</h1>
+
+  <div class="image-section">
+    <img src="/images/spider1.jpg" alt="Spider-Man" class="delete-image">
+  </div>
+
+  <% console.log('Renderizando vista delete.ejs'); %>
+
+  <% if (successMessage) { %>
+    <% console.log('Mensaje de éxito mostrado:', successMessage); %>
+    <!-- Pantalla de éxito -->
+    <div class="success-section">
+      <p class="success-message"><%= successMessage %></p>
+      <img src="/images/spider2.jpg" alt="Éxito" class="success-image">
+      <a href="/" class="big-green-button">Volver al inicio</a>
+    </div>
+  <% } else if (!superhero) { %>
+
+    <!-- Formulario para buscar el ID del superhéroe -->
+    <form action="/api/delete/find" method="POST" class="delete-form">
+      <% console.log('Formulario de búsqueda renderizado'); %>
+      <label for="id">Ingrese el ID del Superhéroe:</label>
+      <input type="text" name="id" id="id" placeholder="ID del superhéroe" required>
+      <div class="button-box">
+        <button type="submit" class="search-button">Buscar</button>
+      </div>
+      <% if (error) { %>
+        <% console.log('Error mostrado en la búsqueda:', error); %>
+        <p class="error-message"><%= error %></p>
+      <% } %>
+    </form>
+    <script>
+      document.querySelector('.delete-form').addEventListener('submit', function (e) {
+        const idInput = document.getElementById('id').value.trim();
+        if (!idInput) {
+          e.preventDefault();
+          alert('Por favor, ingrese un ID válido.');
+        }
+      });
+    </script>
+
+  <% } else { %>
+
+    <% console.log('Superhéroe encontrado:', superhero); %>
+
+    <!-- Información del superhéroe encontrado -->
+    <div class="superhero-info">
+      <p><strong>ID:</strong> <%= superhero._id %></p>
+      <p><strong>Nombre del Superhéroe:</strong> <%= superhero.nombreSuperHeroe %></p>
+      <p><strong>Nombre Real:</strong> <%= superhero.nombreReal %></p>
+      <p><strong>Edad:</strong> <%= superhero.edad %></p>
+      <p><strong>Planeta de Origen:</strong> <%= superhero.planetaOrigen %></p>
+      <p><strong>Debilidad:</strong> <%= superhero.debilidad %></p>
+      <p><strong>Poderes:</strong> <%= superhero.poderes.join(', ') %></p>
+      <p><strong>Aliados:</strong> <%= superhero.aliados.join(', ') %></p>
+      <p><strong>Enemigos:</strong> <%= superhero.enemigos.join(', ') %></p>
+    </div>
+
+    <!-- Confirmación para eliminar el superhéroe -->
+    <form action="/api/delete/<%= superhero._id %>/confirm" method="POST" class="delete-confirm-form">
+      <% console.log('Formulario de confirmación renderizado con ID:', superhero._id); %>
+      <p class="confirm-message">¿Está seguro de que desea eliminar este superhéroe?</p>
+      <div class="button-box">
+        <button type="submit" class="confirm-button">Sí, eliminar</button>
+        <a href="/" class="cancel-button">Cancelar</a>
+      </div>
+    </form>
+
+  <% } %>
+</div>

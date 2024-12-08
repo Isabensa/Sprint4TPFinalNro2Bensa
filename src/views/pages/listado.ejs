@@ -1,0 +1,48 @@
+<main class="main-content">
+  <h1 class="listado-title">Esta es la totalidad de los superhéroes de nuestra SuperANSES</h1>
+
+  <table class="superheroes-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre del Superhéroe</th>
+        <th>Nombre Real</th>
+        <th>Edad</th>
+        <th>Planeta de Origen</th>
+        <th>Debilidad</th>
+        <th>Poderes</th>
+        <th>Aliados</th>
+        <th>Enemigos</th>
+        <th>Autor</th>
+        <th>Fecha de Creación</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% superheroes.forEach(superheroe => { %>
+        <tr>
+          <td><%= superheroe._id %></td>
+          <td><%= superheroe.nombreSuperHeroe %></td>
+          <td><%= superheroe.nombreReal %></td>
+          <td><%= superheroe.edad %></td>
+          <td><%= superheroe.planetaOrigen %></td>
+          <td><%= superheroe.debilidad %></td>
+          <td><%= superheroe.poderes.join(', ') %></td>
+          <td><%= superheroe.aliados.join(', ') %></td>
+          <td><%= superheroe.enemigos.join(', ') %></td>
+          <td><%= superheroe.autor %></td>
+          <td><%= new Date(superheroe.createdAt).toLocaleDateString() %></td>
+          <td>
+            <button class="copy-button" onclick="goHome()">Ir Home</button>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</main>
+
+<script>
+  function goHome() {
+    window.location.href = '/api/'; // Redirige al home
+  }
+</script>
