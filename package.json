@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "main": "src/app.mjs",
+  "main": "app.mjs",
   "dependencies": {
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
@@ -9,6 +9,7 @@
     "express-validator": "^7.2.0",
     "helmet": "^8.0.0",
     "mongoose": "^8.8.4",
+    "node.js": "^0.0.1-security",
     "validator": "^13.12.0"
   },
   "name": "sprint4tpfinalbensa",
