@@ -9,6 +9,10 @@ import superHeroRepository from '../repositories/SuperHeroRepository.mjs';
 import { validationResult } from 'express-validator';
 import { renderizarSuperheroe, renderizarListaSuperheroes } from '../views/responseView.mjs';
 
+console.log({
+  actualizarSuperheroeController,
+});
+
 export async function obtenerSuperheroePorIdController(req, res) {
   const { id } = req.params;
 
@@ -104,10 +108,12 @@ export async function crearSuperheroeController(req, res) {
 }
 
 export async function actualizarSuperheroeController(req, res) {
+  console.log("Cuerpo de la solicitud procesado:", req.body); // Depuración
   const { id } = req.params;
   const { nombreSuperHeroe, nombreReal, edad, planetaOrigen, debilidad, poderes, aliados, enemigos } = req.body;
 
   try {
+       console.log("Cuerpo de la solicitud procesado:", req.body); // Depuración
     const superheroeActualizado = await superHeroRepository.actualizarSuperheroe(id, {
       nombreSuperHeroe,
       nombreReal,
@@ -125,6 +131,7 @@ export async function actualizarSuperheroeController(req, res) {
       res.status(404).send({ mensaje: 'Superhéroe no encontrado' });
     }
   } catch (error) {
+     console.error('Error al guardar el superhéroe:', error);
     console.error('Error al actualizar superhéroe:', error);
     res.status(500).send({ mensaje: 'Error interno del servidor' });
   }
@@ -172,8 +179,6 @@ export async function eliminarSuperheroeController(req, res) {
   }
 }
 
-
-
 export async function buscarSuperheroeParaEliminarController(req, res) {
   console.log('Cuerpo de la solicitud (req.body):', req.body); // Depuración
   const { id } = req.body;
@@ -218,9 +223,3 @@ export async function buscarSuperheroeParaEliminarController(req, res) {
     });
   }
 }
-
-export {
-
- 
- 
-};

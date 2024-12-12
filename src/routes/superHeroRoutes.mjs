@@ -31,7 +31,42 @@ router.get('/heroes/buscar/:atributo/:valor', buscarSuperheroesPorAtributoContro
 router.get('/superheroes/filtros', obtenerSuperheroesMayoresDe30YConFiltrosController);
 
 // Rutas para operaciones POST, PUT y DELETE con validación
-router.post('/superheroes', crearSuperHeroeValidation, validationHandler, crearSuperheroeController);
+
+router.post("/superheroes", crearSuperHeroeValidation, validationHandler, async (req, res) => {
+  try {
+      const {
+          nombreSuperHeroe,
+          nombreReal,
+          edad,
+          planetaOrigen,
+          debilidad,
+          poderes,
+          aliados,
+          enemigos,
+      } = req.body;
+
+      // Crea el superhéroe con los datos validados
+      const nuevoSuperHeroe = new SuperHero({
+          nombreSuperHeroe,
+          nombreReal,
+          edad: Number(edad),
+          planetaOrigen,
+          debilidad,
+          poderes,
+          aliados,
+          enemigos,
+      });
+
+      await nuevoSuperHeroe.save();
+
+      res.status(201).json({ message: "Superhéroe creado correctamente", data: nuevoSuperHeroe });
+  } catch (error) {
+      console.error("Error al crear el superhéroe:", error);
+      res.status(500).json({ error: "Error al crear el superhéroe." });
+  }
+});
+
+//router.post('/superheroes', crearSuperHeroeValidation, validationHandler, crearSuperheroeController);
 router.put('/heroes/:id', actualizarSuperHeroeValidation, validationHandler, actualizarSuperheroeController);
 router.delete('/heroes/:id', eliminarSuperheroeValidation, validationHandler, eliminarSuperheroeController);
 
@@ -52,7 +87,7 @@ router.get('/add', (req, res) => {
 });
 
 // Ruta para manejar el formulario de creación de un superhéroe
-router.post('/add', async (req, res) => {
+router.post('/add', crearSuperHeroeValidation, validationHandler, async (req, res) => {
   try {
     const {
       nombreSuperHeroe,
@@ -60,14 +95,10 @@ router.post('/add', async (req, res) => {
       edad,
       planetaOrigen,
       debilidad,
-      poderes = '',
-      aliados = '',
-      enemigos = '',
+      poderes,
+      aliados,
+      enemigos,
     } = req.body;
-
-    const processedPoderes = poderes ? poderes.split(',').map((p) => p.trim()) : [];
-    const processedAliados = aliados ? aliados.split(',').map((a) => a.trim()) : [];
-    const processedEnemigos = enemigos ? enemigos.split(',').map((e) => e.trim()) : [];
 
     const nuevoSuperHeroe = new SuperHero({
       nombreSuperHeroe,
@@ -75,9 +106,9 @@ router.post('/add', async (req, res) => {
       edad: Number(edad),
       planetaOrigen,
       debilidad,
-      poderes: processedPoderes,
-      aliados: processedAliados,
-      enemigos: processedEnemigos,
+      poderes: poderes || [], // `normalizeArrayFields` ya procesa estos campos
+      aliados: aliados || [],
+      enemigos: enemigos || [],
     });
 
     await nuevoSuperHeroe.save();
@@ -85,12 +116,22 @@ router.post('/add', async (req, res) => {
     res.render('pages/add', {
       title: 'Agregar Superhéroe',
       successMessage: 'El superhéroe fue guardado correctamente en la base de datos',
+      errorMessages: [], // No hay errores
     });
   } catch (error) {
     console.error('Error al guardar el superhéroe:', error);
-    res.status(500).send('Error al guardar el superhéroe.');
+
+    // Extraer los mensajes de error de Mongoose
+    const errorMessages = Object.values(error.errors || {}).map((err) => err.message);
+
+    res.render('pages/add', {
+      title: 'Agregar Superhéroe',
+      successMessage: null,
+      errorMessages, // Lista de mensajes de error
+    });
   }
 });
+
 
 // Ruta para renderizar la vista de edición
 router.get('/edit', (req, res) => {
@@ -113,36 +154,47 @@ router.post('/edit/find', async (req, res) => {
 });
 
 // Ruta para guardar los cambios en el superhéroe
-router.post('/edit/:id/save', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nombreSuperHeroe, nombreReal, edad, planetaOrigen, debilidad, poderes, aliados, enemigos } = req.body;
+router.post(
+  '/edit/:id/save',
+  actualizarSuperHeroeValidation, // Middleware de validación
+  validationHandler, // Middleware para manejar errores
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nombreSuperHeroe, nombreReal, edad, planetaOrigen, debilidad, poderes, aliados, enemigos } = req.body;
 
-    const updatedSuperhero = await SuperHero.findByIdAndUpdate(
-      id,
-      {
-        nombreSuperHeroe,
-        nombreReal,
-        edad: Number(edad),
-        planetaOrigen,
-        debilidad,
-        poderes: poderes ? poderes.split(',').map((p) => p.trim()) : [],
-        aliados: aliados ? aliados.split(',').map((a) => a.trim()) : [],
-        enemigos: enemigos ? enemigos.split(',').map((e) => e.trim()) : [],
-      },
-      { new: true } // Devuelve el documento actualizado
-    );
+      const updatedSuperhero = await SuperHero.findByIdAndUpdate(
+        id,
+        {
+          nombreSuperHeroe,
+          nombreReal,
+          edad: Number(edad),
+          planetaOrigen,
+          debilidad,
+          poderes: poderes || [], // Se asegura que `poderes` sea un arreglo
+          aliados: aliados || [], // Se asegura que `aliados` sea un arreglo
+          enemigos: enemigos || [], // Se asegura que `enemigos` sea un arreglo
+        },
+        { new: true } // Devuelve el documento actualizado
+      );
 
-    if (!updatedSuperhero) {
-      return res.render('pages/edit', { title: 'Editar Superhéroe', superhero: null, error: 'Superhéroe no encontrado', success: null });
+      if (!updatedSuperhero) {
+        return res.status(404).send({ message: 'Superhéroe no encontrado' });
+      }
+
+      res.render('pages/edit', {
+        title: 'Editar Superhéroe',
+        superhero: updatedSuperhero,
+        success: 'Superhéroe editado con éxito',
+        error: null,
+      });
+    } catch (error) {
+      console.error('Error al guardar el superhéroe:', error);
+      res.status(500).send({ error: 'Error al guardar el superhéroe.' });
     }
-
-    res.render('pages/edit', { title: 'Editar Superhéroe', superhero: updatedSuperhero, success: 'Superhéroe editado con éxito', error: null });
-  } catch (error) {
-    console.error('Error al guardar el superhéroe:', error);
-    res.status(500).send('Error al guardar el superhéroe.');
   }
-});
+);
+
 
 // Ruta para mostrar la página de eliminar superhéroe
 router.get('/delete', (req, res) => {
